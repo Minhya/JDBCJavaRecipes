@@ -18,15 +18,15 @@ public class Main {
     //insert new recipe field
     public static void addRecipe(String recipeName, int categoryID, int chefID, int cookingTime) {
         String query = "INSERT INTO recipe (recipeName, FK_CategoryID, FK_ChefID, cookingTime) VALUES (?, ?, ?, ?)";
-        try (Connection conn = DatabaseConnector.connect()) {
-            conn.setAutoCommit(false);
-            PreparedStatement pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, recipeName);
-            pstmt.setInt(2, categoryID);
-            pstmt.setInt(3, chefID);
-            pstmt.setInt(4, cookingTime);
-            pstmt.executeUpdate();
-            conn.commit(); // Commit transaction
+        try (Connection connect = DatabaseConnector.connect()) {
+            connect.setAutoCommit(false);
+            PreparedStatement preparedStatement = connect.prepareStatement(query);
+            preparedStatement.setString(1, recipeName);
+            preparedStatement.setInt(2, categoryID);
+            preparedStatement.setInt(3, chefID);
+            preparedStatement.setInt(4, cookingTime);
+            preparedStatement.executeUpdate();
+            connect.commit(); // Commit transaction
             System.out.println("Recipe added successfully!");
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
@@ -42,13 +42,13 @@ public class Main {
         JOIN chef ch ON r.FK_ChefID = ch.PK_ChefID
     """;
         try (Connection conn = DatabaseConnector.connect();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-            while (rs.next()) {
-                System.out.println("Recipe: " + rs.getString("Recipe") +
-                        ", Category: " + rs.getString("Category") +
-                        ", Chef: " + rs.getString("Chef") +
-                        ", Cooking Time: " + rs.getInt("CookingTime") + " mins");
+             Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                System.out.println("Recipe: " + resultSet.getString("Recipe") +
+                        ", Category: " + resultSet.getString("Category") +
+                        ", Chef: " + resultSet.getString("Chef") +
+                        ", Cooking Time: " + resultSet.getInt("CookingTime") + " mins");
             }
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
@@ -58,11 +58,11 @@ public class Main {
     //update
     public static void updateRecipe(int recipeID, String newRecipeName) {
         String query = "UPDATE recipe SET recipeName = ? WHERE PK_RecipeID = ?";
-        try (Connection conn = DatabaseConnector.connect();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setString(1, newRecipeName);
-            pstmt.setInt(2, recipeID);
-            pstmt.executeUpdate();
+        try (Connection connect = DatabaseConnector.connect();
+             PreparedStatement preparedStatement = connect.prepareStatement(query)) {
+            preparedStatement.setString(1, newRecipeName);
+            preparedStatement.setInt(2, recipeID);
+            preparedStatement.executeUpdate();
             System.out.println("Recipe updated successfully!");
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
@@ -71,10 +71,10 @@ public class Main {
     //delete
     public static void deleteRecipe(int recipeID) {
         String query = "DELETE FROM recipe WHERE PK_RecipeID = ?";
-        try (Connection conn = DatabaseConnector.connect();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setInt(1, recipeID);
-            pstmt.executeUpdate();
+        try (Connection connect = DatabaseConnector.connect();
+             PreparedStatement preparedStatement = connect.prepareStatement(query)) {
+            preparedStatement.setInt(1, recipeID);
+            preparedStatement.executeUpdate();
             System.out.println("Recipe deleted successfully!");
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
@@ -87,13 +87,13 @@ public class Main {
                 "FROM recipe r " +
                 "JOIN category c ON r.FK_CategoryID = c.PK_CategoryID " +
                 "JOIN chef ch ON r.FK_ChefID = ch.PK_ChefID";
-        try (Connection conn = DatabaseConnector.connect();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-            while (rs.next()) {
-                System.out.println("Recipe: " + rs.getString("Recipe") +
-                        ", Category: " + rs.getString("Category") +
-                        ", Chef: " + rs.getString("Chef"));
+        try (Connection connect = DatabaseConnector.connect();
+             Statement statement = connect.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                System.out.println("Recipe: " + resultSet.getString("Recipe") +
+                        ", Category: " + resultSet.getString("Category") +
+                        ", Chef: " + resultSet.getString("Chef"));
             }
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
@@ -101,10 +101,10 @@ public class Main {
     }
     public static void markAsFavorite(int recipeID) {
         String query = "UPDATE recipe SET favorite = 1 WHERE PK_RecipeID = ?";
-        try (Connection conn = DatabaseConnector.connect();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setInt(1, recipeID);
-            pstmt.executeUpdate();
+        try (Connection connect = DatabaseConnector.connect();
+             PreparedStatement preparedStatement = connect.prepareStatement(query)) {
+            preparedStatement.setInt(1, recipeID);
+            preparedStatement.executeUpdate();
             System.out.println("Recipe marked as favorite!");
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
@@ -112,12 +112,12 @@ public class Main {
     }
     public static void viewFavorites() {
         String query = "SELECT * FROM recipe WHERE favorite = 1";
-        try (Connection conn = DatabaseConnector.connect();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-            while (rs.next()) {
-                System.out.println("Recipe: " + rs.getString("recipeName") +
-                        ", Cooking Time: " + rs.getInt("cookingTime") + " mins");
+        try (Connection connect = DatabaseConnector.connect();
+             Statement statement = connect.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            while (resultSet.next()) {
+                System.out.println("Recipe: " + resultSet.getString("recipeName") +
+                        ", Cooking Time: " + resultSet.getInt("cookingTime") + " mins");
             }
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
@@ -130,13 +130,13 @@ public class Main {
             (SELECT COUNT(*) FROM chef) AS totalChefs,
             (SELECT COUNT(*) FROM category) AS totalCategories
         """;
-        try (Connection conn = DatabaseConnector.connect();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-            if (rs.next()) {
-                System.out.println("Total Recipes: " + rs.getInt("totalRecipes"));
-                System.out.println("Total Chefs: " + rs.getInt("totalChefs"));
-                System.out.println("Total Categories: " + rs.getInt("totalCategories"));
+        try (Connection connect = DatabaseConnector.connect();
+             Statement statement = connect.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+            if (resultSet.next()) {
+                System.out.println("Total Recipes: " + resultSet.getInt("totalRecipes"));
+                System.out.println("Total Chefs: " + resultSet.getInt("totalChefs"));
+                System.out.println("Total Categories: " + resultSet.getInt("totalCategories"));
             }
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
